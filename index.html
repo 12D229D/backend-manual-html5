@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual y Guía Completa de Backend | HTML5 Documentation</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Lateral Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="index.html" class="nav-link active">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="backend/nodejs.html" class="nav-link">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="backend/express.html" class="nav-link">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="backend/databases.html" class="nav-link">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="backend/auth.html" class="nav-link">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="backend/deploy.html" class="nav-link">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Conceptos Fundamentales</div>
+        <a href="#arquitectura" class="nav-link"><span>Arquitectura Cliente-Servidor</span></a>
+        <a href="#middlewares" class="nav-link"><span>Middlewares & Rutas</span></a>
+        <a href="#orm" class="nav-link"><span>ORM y Capa de Datos</span></a>
+        <a href="#variables" class="nav-link"><span>Variables de Entorno</span></a>
+        <a href="#simulador" class="nav-link"><span>Simulador de Servidor</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Workspace Content -->
+  <div class="main-wrapper">
+    <!-- Header Topbar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb">Documentación / <span>Guía Principal de Backend</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="content-container">
+
+      <!-- Hero Header Card -->
+      <section class="hero-card">
+        <h2>Manual & Guía Completa de Backend</h2>
+        <p>Aprende a construir, estructurar y desplegar aplicaciones backend modernas con Node.js, Express, bases de datos SQL/NoSQL y autenticación segura. Explora patrones de arquitectura, middlewares, ORMs y DevOps con ejemplos prácticos e interactivos.</p>
+        <div class="hero-actions">
+          <a href="backend/nodejs.html" class="btn-primary">Comenzar con Node.js →</a>
+          <a href="#simulador" class="btn-secondary">Probar Simulador de Servidor</a>
+        </div>
+      </section>
+
+      <!-- Architecture Overview Cards -->
+      <section class="cards-grid">
+        <article class="card">
+          <div class="card-icon green">🟢</div>
+          <h3>Node.js & npm</h3>
+          <p>Entorno de ejecución JavaScript en el servidor basado en V8. Asincronía con Event Loop, módulos CommonJS/ESM y gestión de paquetes con npm.</p>
+          <a href="backend/nodejs.html" class="card-link">Ver guía de Node.js →</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon blue">🚂</div>
+          <h3>Express.js</h3>
+          <p>Framework minimalista para construir APIs y aplicaciones web. Sistema de enrutado, middlewares encadenables y gestión de peticiones HTTP.</p>
+          <a href="backend/express.html" class="card-link">Ver guía de Express →</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon amber">🗄️</div>
+          <h3>Bases de Datos</h3>
+          <p>Bases SQL (PostgreSQL, MySQL) y NoSQL (MongoDB). ORMs como Prisma y Sequelize. Migraciones, índices y transacciones ACID.</p>
+          <a href="backend/databases.html" class="card-link">Ver guía de BD →</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon red">🔐</div>
+          <h3>Autenticación & JWT</h3>
+          <p>Autenticación con JSON Web Tokens, hashing de contraseñas con bcrypt, control de sesión, refresh tokens y RBAC.</p>
+          <a href="backend/auth.html" class="card-link">Ver guía de Auth →</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon purple">🚀</div>
+          <h3>Despliegue & DevOps</h3>
+          <p>Contenerización con Docker, variables de entorno, CI/CD, logs, balanceo de carga y despliegue en producción (Render, Railway, VPS).</p>
+          <a href="backend/deploy.html" class="card-link">Ver guía de Despliegue →</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon cyan">🛡️</div>
+          <h3>Seguridad & Buenas Prácticas</h3>
+          <p>Helmet, CORS, rate limiting, validación de inputs, prevención de SQLi/XSS y principios de seguridad por defecto.</p>
+          <a href="backend/auth.html" class="card-link">Ver Seguridad →</a>
+        </article>
+      </section>
+
+      <!-- Section: Arquitectura Cliente-Servidor -->
+      <section class="doc-section" id="arquitectura">
+        <h2>Arquitectura Cliente-Servidor</h2>
+        <p>El backend es la capa del servidor que gestiona la lógica de negocio, persistencia de datos y exposición de APIs que el frontend consume. En una arquitectura típica de 3 capas (three-tier) encontramos:</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Capa</th>
+                <th>Responsabilidad</th>
+                <th>Tecnologías típicas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Presentación</strong></td>
+                <td>Interfaz de usuario, renders, peticiones al backend.</td>
+                <td>React, Vue, HTML5/CSS3, Fetch API</td>
+              </tr>
+              <tr>
+                <td><strong>Lógica de Negocio</strong></td>
+                <td>Reglas de negocio, validaciones, middlewares, orquestación.</td>
+                <td>Node.js + Express, Python (Django/FastAPI), Java (Spring)</td>
+              </tr>
+              <tr>
+                <td><strong>Persistencia</strong></td>
+                <td>Almacenamiento duradero, consultas, integridad de datos.</td>
+                <td>PostgreSQL, MySQL, MongoDB, Redis</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 ¿Por qué usar una arquitectura por capas?</div>
+          <p>La separación de responsabilidades facilita el mantenimiento, permite escalar y reemplazar capas de manera independiente, y mejora la testabilidad del sistema.</p>
+        </div>
+      </section>
+
+      <!-- Section: Middlewares y Rutas -->
+      <section class="doc-section" id="middlewares">
+        <h2>Middlewares y Rutas HTTP</h2>
+        <p>Un <strong>middleware</strong> es una función que se ejecuta entre la recepción de la petición y la respuesta final. Express los encadena en orden de registro. Pueden leer/modificar <code>req</code> y <code>res</code>, y decidir si continúan con <code>next()</code>.</p>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag get">GET</span>
+            <span class="endpoint-path">/api/v1/usuarios</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Devuelve la lista de usuarios. Aplica middlewares de autenticación, log y validación previamente.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag post">POST</span>
+            <span class="endpoint-path">/api/v1/usuarios</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Crea un nuevo usuario. Verifica el body de la petición, valida el esquema, hashea la contraseña y persiste en BD.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag delete">DELETE</span>
+            <span class="endpoint-path">/api/v1/usuarios/:id</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Elimina un usuario existente por su identificador. Requiere rol de administrador.</p>
+          </div>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>express - cadena de middlewares</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>const express = require('express');
+const app = express();
+
+// Middleware global: logger
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
+
+// Middleware integrado: parse JSON body
+app.use(express.json());
+
+// Ruta con múltiples middlewares encadenados
+app.post('/api/v1/usuarios',
+  validarSchema,
+  hashearPassword,
+  crearUsuario,
+  (req, res) => res.status(201).json(req.usuario)
+);
+
+app.listen(3000, () => console.log('Server on :3000'));</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: ORM -->
+      <section class="doc-section" id="orm">
+        <h2>ORM y Capa de Datos</h2>
+        <p>Un <strong>ORM (Object-Relational Mapping)</strong> abstrae la base de datos en modelos de objetos del lenguaje, evitando escribir SQL crudo y reduciendo el riesgo de inyección SQL. Algunos populares:</p>
+
+        <ul>
+          <li><strong>Prisma</strong> — Genera un cliente tipado a partir de un esquema declarativo. Excelente DX con TypeScript.</li>
+          <li><strong>Sequelize</strong> — ORM maduro para Node.js con soporte para PostgreSQL, MySQL, SQLite y MSSQL.</li>
+          <li><strong>TypeORM</strong> — Inspirado en Hibernate (Java), soporta patrón Active Record y Data Mapper.</li>
+          <li><strong>Mongoose</strong> — Modelado de objetos para MongoDB con esquemas y validaciones.</li>
+        </ul>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ Cuidado con el patrón N+1</div>
+          <p>Los ORM pueden generar involuntariamente una consulta adicional por cada elemento de una lista (problema N+1). Usa <code>include</code>, <code>populate</code> o <code>eager loading</code> para evitarlo en lecturas relacionadas.</p>
+        </div>
+      </section>
+
+      <!-- Section: Variables de Entorno -->
+      <section class="doc-section" id="variables">
+        <h2>Variables de Entorno (.env)</h2>
+        <p>Las credenciales, puertos, URLs de base de datos y secretos <strong>nunca deben ir en el código fuente</strong>. Se almacenan en variables de entorno típicamente cargadas con el paquete <code>dotenv</code>.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>.env (no se commitea, va en .gitignore)</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>PORT=3000
+NODE_ENV=development
+DATABASE_URL=postgresql://user:pass@localhost:5432/mi_db
+JWT_SECRET=cadena_super_secreta_de_64_chars
+JWT_EXPIRES_IN=2h
+CORS_ORIGIN=http://localhost:5173</code></pre>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">🚨 Peligro de seguridad</div>
+          <p>Nunca expongas <code>JWT_SECRET</code> o <code>DATABASE_URL</code> en el frontend, en repositorios públicos, ni en logs del servidor. Usa un gestor de secretos (Vault, AWS Secrets Manager) en producción.</p>
+        </div>
+      </section>
+
+      <!-- Interactive Server Simulator -->
+      <section class="doc-section" id="simulador">
+        <h2>Simulador Interactivo de Servidor</h2>
+        <p>Arranca y detén un servidor backend simulado, observa su log de arranque y las peticiones HTTP que va atendiendo en tiempo real:</p>
+
+        <div class="tester-box">
+          <div class="tester-title">🖥️ Consola del Servidor Backend</div>
+          <div class="tester-controls">
+            <input type="text" id="server-port" value="3000" placeholder="Puerto">
+            <button class="btn-primary" id="server-start-btn">▶ Arrancar</button>
+            <button class="btn-secondary" id="server-stop-btn">⏹ Detener</button>
+          </div>
+          <div class="response-box" id="server-log">// Pulsa "Arrancar" para iniciar el servidor simulado y ver los logs de peticiones en vivo</div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5. Diseñado para desarrolladores de software.</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

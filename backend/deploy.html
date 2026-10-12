@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Despliegue & DevOps | Manual de Backend</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="../index.html" class="nav-link">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="nodejs.html" class="nav-link">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="express.html" class="nav-link">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="databases.html" class="nav-link">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="auth.html" class="nav-link">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="deploy.html" class="nav-link active">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Temas Despliegue</div>
+        <a href="#ciclo" class="nav-link"><span>Ciclo DevOps</span></a>
+        <a href="#docker" class="nav-link"><span>Docker & Contenedores</span></a>
+        <a href="#env" class="nav-link"><span>Configuración por entorno</span></a>
+        <a href="#pm2" class="nav-link"><span>PM2 & Node en prod</span></a>
+        <a href="#cicd" class="nav-link"><span>CI/CD con GitHub Actions</span></a>
+        <a href="#proxies" class="nav-link"><span>Reverse Proxy & TLS</span></a>
+        <a href="#observ" class="nav-link"><span>Logs & Monitorización</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb"><a href="../index.html">Documentación</a> / <span>Guía de Despliegue & DevOps</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <section class="hero-card">
+        <h2>🚀 Guía Práctica de Despliegue & DevOps</h2>
+        <p>LLevar una aplicación Node.js a producción va más allá del código: contenerización, gestión de secretos, procesos robustos, CI/CD automatizado, terminación TLS y observabilidad. Aquí tienes el flujo completo.</p>
+        <div class="hero-actions">
+          <a href="#docker" class="btn-primary">Ver Docker →</a>
+          <a href="#cicd" class="btn-secondary">CI/CD con GitHub Actions →</a>
+        </div>
+      </section>
+
+      <section class="doc-section" id="ciclo">
+        <h2>Ciclo DevOps</h2>
+        <p>DevOps unifica Desarrollo (Dev) y Operaciones (Ops) en un único flujo iterativo basado en automatización, feedback y métricas. El ciclo típico es:</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Fase</th><th>Acciones</th><th>Herramientas</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Plan</td><td>Requisitos, backlog, tickets</td><td>Jira, Linear, GitHub Issues</td></tr>
+              <tr><td>Code</td><td>Branches, revisiones, PRs</td><td>Git, GitHub, GitLab</td></tr>
+              <tr><td>Build</td><td>Instalar dependencias, lint, test, build</td><td>npm, esbuild, tsx</td></tr>
+              <tr><td>Test</td><td>Unit, integration, E2E</td><td>Vitest, Jest, Playwright</td></tr>
+              <tr><td>Release</td><td>Empaquetar imagen, tag semver</td><td>Docker, GitHub Packages</td></tr>
+              <tr><td>Deploy</td><td>Desplegar en entorno</td><td>Docker Compose, Helm, Railway</td></tr>
+              <tr><td>Operate & Monitor</td><td>Logs, métricas, alertas</td><td>Grafana, Prometheus, Sentry</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="doc-section" id="docker">
+        <h2>Docker & Contenedores</h2>
+        <p>Docker empaqueta tu app junto con sus dependencias y sistema operativo base en una <strong>imagen</strong> reproducible. El siguiente Dockerfile usa <em>multi-stage</em> para producir imágenes pequeñas.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Dockerfile - multi-stage</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code># ---- Stage 1: build deps ----
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# ---- Stage 2: runtime ----
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+USER node                                       # No usar root
+EXPOSE 3000
+CMD ["node", "src/server.js"]</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>docker-compose.yml - app + postgres</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>services:
+  api:
+    build: .
+    ports: ["3000:3000"]
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/mi_db
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on: [db]
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mi_db
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+
+volumes:
+  pgdata:</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">.dockerignore es esencial</div>
+          <p>Incluye <code>node_modules</code>, <code>.env</code>, <code>.git</code>, <code>dist</code> en <code>.dockerignore</code> para no copiarlos al contexto de build y acelerar las imágenes evitando filtrar secretos.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="env">
+        <h2>Configuración por entorno</h2>
+        <p>Una buena app se adapta a su entorno sin cambios de código. Las 12-factor apps lo recomiendan: <em>store config in the environment</em>.</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Variable</th><th>Dev</th><th>Producción</th></tr></thead>
+            <tbody>
+              <tr><td><code>NODE_ENV</code></td><td><code>development</code></td><td><code>production</code></td></tr>
+              <tr><td><code>PORT</code></td><td>3000</td><td>puerto del contenedor</td></tr>
+              <tr><td><code>DATABASE_URL</code></td><td>localhost</td><td>host de BD gestionada</td></tr>
+              <tr><td><code>JWT_SECRET</code></td><td>ficcio</td><td>32+ bytes aleatorios en gestor de secretos</td></tr>
+              <tr><td><code>CORS_ORIGIN</code></td><td><code>http://localhost:5173</code></td><td>dominio HTTPS de prod</td></tr>
+              <tr><td><code>LOG_LEVEL</code></td><td>debug</td><td>info/warn</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="doc-section" id="pm2">
+        <h2>PM2: procesos Node robustos</h2>
+        <p>Si no usas Docker, <code>pm2</code> es el estándar para ejecutar Node en producción: reinicia en crash, balancea con cluster mode y guarda logs.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ecosystem.config.cjs - cluster mode</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>module.exports = {
+  apps: [{
+    name: 'mi-backend',
+    script: 'src/server.js',
+    instances: 'max',        // usa todos los núcleos
+    exec_mode: 'cluster',
+    max_memory_restart: '400M',
+    env:     { NODE_ENV: 'production' }
+  }]
+};
+
+// Comandos:
+// pm2 start ecosystem.config.cjs
+// pm2 logs            → ver logs en vivo
+// pm2 reload all      → reinicio sin downtime
+// pm2 monit           → panel de CPU/memoria</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="cicd">
+        <h2>CI/CD con GitHub Actions</h2>
+        <p>El siguiente workflow corre tests y construye la imagen Docker en cada <code>push</code> a <code>main</code>:</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>.github/workflows/ci.yml</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>name: CI - Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --coverage
+      - name: Build Docker image
+        run: docker build -t mi-backend:${{ github.sha }} .
+      - name: Login & Push
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login -u ${{ secrets.REGISTRY_USER }} --password-stdin
+          docker tag  mi-backend:${{ github.sha }} ${{ secrets.REGISTRY }}/mi-backend:latest
+          docker push ${{ secrets.REGISTRY }}/mi-backend:latest</code></pre>
+        </div>
+
+      </section>
+
+      <section class="doc-section" id="proxies">
+        <h2>Reverse Proxy con Nginx y TLS</h2>
+        <p>En producción, no expongas Node directamente a Internet. Un reverse proxy (Nginx/Caddy/Traefik) termina TLS, aplana logs, comprime respuestas y filtra tráfico.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>nginx - reverse proxy a Node</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>server {
+    listen 443 ssl http2;
+    server_name api.midominio.com;
+
+    ssl_certificate     /etc/letsencrypt/live/api.midominio.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.midominio.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 Caddy con TLS automático</div>
+          <p>Si no quieres gestionar certificados manualmente, <a href="https://caddyserver.com">Caddy</a> emite y renueva certificados Let's Encrypt automáticamente con una sola línea: <code>api.midominio.com { reverse_proxy localhost:3000 }</code>.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="observ">
+        <h2>Logs y observabilidad</h2>
+        <ul>
+          <li>Emite logs en <strong>JSON estructurado</strong> ( Winston, pino ) para ingestión en ELK/Loki.</li>
+          <li>Aplica niveles correctos: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>.</li>
+          <li>No registres credenciales, tokens ni PII sensible.</li>
+          <li>Integra monitorización de errores con Sentry, Rollbar o Datadog.</li>
+          <li>Recolecta métricas (latencia, tasa de error, peticiones por segundo) con Prometheus + Grafana.</li>
+          <li>Implementa <em>healthchecks</em> en <code>/health</code> y <code>/ready</code> para orquestadores.</li>
+        </ul>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>src/server.js - endpoint /health</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>app.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', uptime: process.uptime(), db: 'connected' });
+  } catch (err) {
+    res.status(503).json({ status: 'down', db: err.message });
+  }
+});</code></pre>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5 — Capítulo: Despliegue & DevOps.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

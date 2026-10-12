@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Bases de Datos | Manual de Backend</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="../index.html" class="nav-link">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="nodejs.html" class="nav-link">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="express.html" class="nav-link">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="databases.html" class="nav-link active">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="auth.html" class="nav-link">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="deploy.html" class="nav-link">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Temas Bases de Datos</div>
+        <a href="#sql-nosql" class="nav-link"><span>SQL vs NoSQL</span></a>
+        <a href="#postgres" class="nav-link"><span>PostgreSQL</span></a>
+        <a href="#mongoose" class="nav-link"><span>MongoDB + Mongoose</span></a>
+        <a href="#prisma" class="nav-link"><span>ORM: Prisma</span></a>
+        <a href="#transacciones" class="nav-link"><span>Transacciones ACID</span></a>
+        <a href="#indices" class="nav-link"><span>Índices y Performance</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb"><a href="../index.html">Documentación</a> / <span>Guía de Bases de Datos</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <section class="hero-card">
+        <h2>🗄️ Guía Práctica de Bases de Datos</h2>
+        <p>La capa de persistencia es el corazón de cualquier backend durable. Conoce las diferencias entre bases SQL y NoSQL, los ORMs más populares y patrones esenciales como migraciones, transacciones ACID e índices.</p>
+        <div class="hero-actions">
+          <a href="#prisma" class="btn-primary">Ver ORM con Prisma →</a>
+          <a href="#transacciones" class="btn-secondary">Transacciones ACID →</a>
+        </div>
+      </section>
+
+      <section class="doc-section" id="sql-nosql">
+        <h2>SQL vs NoSQL: ¿cuál elegir?</h2>
+        <p>No existe un ganador universal; la elección depende del tipo de datos, la consistencia requerida y la escala esperada.</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>SQL (Relacional)</th>
+                <th>NoSQL (Documental / Clave-Valor)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Ejemplos</td><td>PostgreSQL, MySQL, SQLite, MS SQL</td><td>MongoDB, Redis, DynamoDB, Cassandra</td></tr>
+              <tr><td>Esquema</td><td>Rígido, tablas y columnas definidas</td><td>Flexible, documentos JSON</td></tr>
+              <tr><td>Transacciones</td><td>ACID garantizadas</td><td>ACID parcial (Mongo 4+ lo soporta)</td></tr>
+              <tr><td>Consultas</td><td>SQL declarativo + JOINs</td><td>API del driver / agregaciones</td></tr>
+              <tr><td>Casos ideales</td><td>Datos con relaciones fuertes, financieros, ERP</td><td>Catálogos, contenido variable, caché, IoT</td></tr>
+              <tr><td>Escalado</td><td>Vertical (más CPU/RAM)</td><td>Horizontal (sharding nativo)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 Regla general</div>
+          <p>Si tus datos encajan en tablas relacionales y necesitas consistencia transaccional estricta, usa <strong>PostgreSQL</strong>. Si los documentos son jerárquicos y varían mucho, valora <strong>MongoDB</strong>.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="postgres">
+        <h2>PostgreSQL con el driver nativo</h2>
+        <p>PostgreSQL es el motor relacional open source más potente. El paquete <code>pg</code> permite conectarse y ejecutarconsultas preparadas.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>config/db.js - pool de conexiones</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import pg from 'pg';
+const { Pool } = pg;
+
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // produc­ción: usar SSL y limitar pool
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 10                          // máx. 10 conexiones reutilizables
+});
+
+pool.on('error', (err) => console.error('Error inesperado en pool:', err));</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>usuarios.repository.js - consultas preparadas (anti-SQLi)</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import { pool } from '../config/db.js';
+
+export async function listarUsuarios({ limite = 20, offset = 0 } = {}) {
+  const { rows } = await pool.query(
+    'SELECT id, email, nombre, rol FROM usuarios ORDER BY id LIMIT $1 OFFSET $2',
+    [limite, offset]
+  );
+  return rows;
+}
+
+export async function crearUsuario({ email, passwordHash, nombre }) {
+  const { rows } = await pool.query(
+    `INSERT INTO usuarios (email, password_hash, nombre)
+     VALUES ($1, $2, $3)
+     RETURNING id, email, nombre, rol`,
+    [email, passwordHash, nombre]
+  );
+  return rows[0];
+}</code></pre>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">🚨 Jamás concatenes valores en SQL</div>
+          <p>Construir SQL con template strings como <code>`... WHERE id = ${req.params.id}`</code> abre la puerta a <strong>SQL Injection</strong>. Usa SIEMPRE consultas parametrizadas (<code>$1</code>, <code>$2</code>, …).</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="mongoose">
+        <h2>MongoDB con Mongoose</h2>
+        <p>Mongoose es la librería más popular para modelar datos en MongoDB desde Node.js. Define esquemas con validaciones y tipos, y genera un modelo listo para CRUD.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>models/usuario.model.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import mongoose from 'mongoose';
+
+const usuarioSchema = new mongoose.Schema({
+  email:    { type: String, required: true, unique: true, lowercase: true },
+  nombre:   { type: String, required: true, trim: true },
+  password: { type: String, required: true, minlength: 8, select: false },
+  rol:      { type: String, enum: ['admin', 'user'], default: 'user' },
+  creadoEn: { type: Date, default: Date.now }
+});
+
+// Índice compuesto para búsquedas
+usuarioSchema.index({ nombre: 1, creadoEn: -1 });
+
+export const Usuario = mongoose.model('Usuario', usuarioSchema);</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>usuarios.service.js - operaciones CRUD</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import { Usuario } from '../models/usuario.model.js';
+
+export async function crearUsuario(dto) {
+  return Usuario.create(dto);
+}
+
+export async function buscarPorEmail(email) {
+  return Usuario.findOne({ email }).select('+password');
+}
+
+// .populate reemplaza ObjectId por el documento completo
+export async function pedidosDeUsuario(id) {
+  return Usuario.findById(id).populate('pedidos');
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="prisma">
+        <h2>ORM moderno: Prisma</h2>
+        <p>Prisma genera un cliente tipado a partir de un esquema declarativo, ofreciendo autocompletado y seguridad de tipos en TypeScript. Soporta PostgreSQL, MySQL, SQLite, SQL Server y MongoDB.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>prisma/schema.prisma</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nombre    String
+  password  String
+  pedidos   Pedido[]
+  creadoEn  DateTime @default(now())
+}
+
+model Pedido {
+  id        Int      @id @default(autoincrement())
+  total     Decimal  @db.Decimal(10, 2)
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
+}</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>using Prisma Client</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+// Read con relaciones incluidas (no N+1)
+const usuarioConPedidos = await prisma.usuario.findUnique({
+  where: { id: 1 },
+  include: { pedidos: true }
+});
+
+// Create en dos tablas en una sola transacción
+const nuevo = await prisma.usuario.create({
+  data: {
+    email: 'ana@demo.com',
+    nombre: 'Ana',
+    password: hash,
+    pedidos: { create: [{ total: 99.5 }] }
+  },
+  include: { pedidos: true }
+});</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="transacciones">
+        <h2>Transacciones ACID</h2>
+        <p>Una transacción agrupa varias operaciones que deben ejecutarse <strong>atómicamente</strong>: o se completan todas, o ninguna. Las propiedades ACID son:</p>
+        <ul>
+          <li><strong>Atomicidad</strong>: todo o nada.</li>
+          <li><strong>Consistencia</strong>: el esquema y restricciones se respetan.</li>
+          <li><strong>Aislamiento</strong>: transacciones concurrentes no interfieren.</li>
+          <li><strong>Durabilidad</strong>: una vez commiteada, persiste ante fallos.</li>
+        </ul>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Transferencia bancaria como transacción SQL</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>const client = await pool.connect();
+try {
+  await client.query('BEGIN');
+
+  await client.query('UPDATE cuentas SET saldo = saldo - $1 WHERE id = $2', [monto, origen]);
+  await client.query('UPDATE cuentas SET saldo = saldo + $1 WHERE id = $2', [monto, destino]);
+  await client.query('INSERT INTO transferencias (origen, destino, monto) VALUES ($1,$2,$3)', [origen, destino, monto]);
+
+  await client.query('COMMIT');
+} catch (err) {
+  await client.query('ROLLBACK');
+  throw err;
+} finally {
+  client.release();
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="indices">
+        <h2>Índices y rendimiento</h2>
+        <p>Un <strong>índice</strong> es una estructura auxiliar que acelera las consultas <code>WHERE</code> y <code>JOIN</code> a costa de ocupar más espacio y ralentizar las escrituras. Buenas prácticas:</p>
+        <ul>
+          <li>Crea índices sobre columnas usadas frecuentemente en filtros y foreign keys.</li>
+          <li>Usa <strong>índices compuestos</strong> respetando el orden de las columnas del <code>WHERE</code>.</li>
+          <li>Audita consultas lentas con <code>EXPLAIN ANALYZE</code> en PostgreSQL.</li>
+          <li>Evita el <code>SELECT *</code>; pide solo las columnas necesarias.</li>
+          <li>Pagina grandes listas con <code>LIMIT/OFFSET</code> o, mejor, <em>keyset pagination</em>.</li>
+        </ul>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ Evita el problema N+1</div>
+          <p>Si por cada usuario de una lista haces otra consulta para sus pedidos, harás 1 + N consultas. Usa <code>include</code> en Prisma, <code>populate</code> en Mongoose o un <code>JOIN</code> en SQL para resolverlo en una sola ida.</p>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5 — Capítulo: Bases de Datos.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

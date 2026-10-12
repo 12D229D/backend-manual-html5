@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Autenticación & JWT | Manual de Backend</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="../index.html" class="nav-link">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="nodejs.html" class="nav-link">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="express.html" class="nav-link">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="databases.html" class="nav-link">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="auth.html" class="nav-link active">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="deploy.html" class="nav-link">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Temas Autenticación</div>
+        <a href="#conceptos" class="nav-link"><span>Authn vs Authz</span></a>
+        <a href="#bcrypt" class="nav-link"><span>Hashing con bcrypt</span></a>
+        <a href="#jwt" class="nav-link"><span>Estructura de un JWT</span></a>
+        <a href="#flujo" class="nav-link"><span>Flujo Login → Token</span></a>
+        <a href="#refresh" class="nav-link"><span>Refresh Tokens</span></a>
+        <a href="#rbac" class="nav-link"><span>RBAC & Roles</span></a>
+        <a href="#seguridad" class="nav-link"><span>Endurecimiento</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb"><a href="../index.html">Documentación</a> / <span>Guía de Autenticación & JWT</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <section class="hero-card">
+        <h2>🔐 Guía Práctica de Autenticación & JWT</h2>
+        <p>La autenticación verifica <strong>quién</strong> es el usuario; la autorización decide <strong>qué</strong> puede hacer. Conoce JWT, bcrypt, refresh tokens, RBAC y los endurecimientos esenciales para una API segura en producción.</p>
+        <div class="hero-actions">
+          <a href="#jwt" class="btn-primary">Anatomía de un JWT →</a>
+          <a href="#seguridad" class="btn-secondary">Checklist de seguridad →</a>
+        </div>
+      </section>
+
+      <section class="doc-section" id="conceptos">
+        <h2>Autenticación vs Autorización</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Concepto</th><th>Pregunta</th><th>Ejemplos</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Autenticación (Authn)</strong></td>
+                <td>¿Quién eres?</td>
+                <td>JWT, sesiones cookie, OAuth, biometría</td>
+              </tr>
+              <tr>
+                <td><strong>Autorización (Authz)</strong></td>
+                <td>¿Qué puedes hacer?</td>
+                <td>RBAC, ABAC, scopes, ACL</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="doc-section" id="bcrypt">
+        <h2>Hashing de contraseñas con bcrypt</h2>
+        <p>Las contraseñas <strong>nunca</strong> se guardan en claro ni con MD5/SHA sin coste. <code>bcrypt</code> genera un hash con <em>salt</em> integrado y un factor de coste ajustable, lo que lo resistente a ataques de diccionario y a hardware GPU/ASIC.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>utils/password.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import bcrypt from 'bcryptjs';
+
+const RONDAS = 12; // Coste: 2^12. Aumentar con el tiempo.
+
+export async function hashear(plain) {
+  return bcrypt.hash(plain, RONDAS);
+}
+
+export async function verificar(plain, hash) {
+  return bcrypt.compare(plain, hash);
+}
+
+// Uso:
+// const hash = await hashear('password123');
+// const ok   = await verificar('password123', hash);</code></pre>
+        </div>
+
+        <div class="callout callout-danger">
+          <div class="callout-title">🚫 Nunca uses SHA-256 puro</div>
+          <p>Funciones como SHA-256 son demasiado rápidas; un atacante con una GPU puede probar miles de millones de combinaciones por segundo. Usa funciones lentas y con salt: <code>bcrypt</code>, <code>argon2</code> o <code>scrypt</code>.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="jwt">
+        <h2>Anatomía de un JSON Web Token (JWT)</h2>
+        <p>Un JWT es una cadena compacta firmada que viaja en la cabecera <code>Authorization: Bearer <token></code>. Se compone de tres partes separadas por punto: <code>header.payload.signature</code>.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Estructura de un JWT</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9   ← Header (alg, typ)
+.eyJzdWIiOiIxIiwiZW1haWwiOiJhbkB4LmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3MDAwMDcyMDB9   ← Payload (claims)
+.s8f3Kd2Lp9QwVn2Xb8Hj3kL9pQz1RwYn4Xm7Vc2A0I   ← Signature (HMAC-SHA256)
+
+// Header
+{ "alg": "HS256", "typ": "JWT" }
+
+// Payload
+{
+  "sub":   "1",                          // ID del usuario
+  "email": "an@x.com",
+  "rol":   "user",
+  "iat":   1700000000,                   // issued at
+  "exp":   1700007200                    // expira a las 2h
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">📌 JWT no es encriptación</div>
+          <p>El payload va <strong>codificado en Base64Url</strong>, no cifrado: cualquiera con el token puede leerlo. La firma garantiza integridad (<em>no ha sido modificado</em>) y autenticidad (<em>proveído por nosotros</em>). No pongas datos sensibles en el payload.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="flujo">
+        <h2>Flujo completo: Registro y Login</h2>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>controllers/auth.controller.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { buscarPorEmail, crearUsuario } from '../services/usuarios.service.js';
+
+const SECRETO   = process.env.JWT_SECRET;
+const EXPIRACION = process.env.JWT_EXPIRES_IN ?? '2h';
+
+export async function registro(req, res, next) {
+  try {
+    const { email, password, nombre } = req.body;
+    const existe = await buscarPorEmail(email);
+    if (existe) return res.status(409).json({ error: 'Email ya registrado' });
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await crearUsuario({ email, passwordHash, nombre });
+
+    res.status(201).json({ id: user.id, email: user.email, nombre: user.nombre });
+  } catch (err) { next(err); }
+}
+
+export async function login(req, res, next) {
+  try {
+    const { email, password } = req.body;
+    const user = await buscarPorEmail(email);
+    if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) return res.status(401).json({ error: 'Credenciales inválidas' });
+
+    const token = jwt.sign(
+      { sub: user.id, email: user.email, rol: user.rol },
+      SECRETO,
+      { expiresIn: EXPIRACION }
+    );
+    res.json({ token, usuario: { id: user.id, email: user.email, rol: user.rol } });
+  } catch (err) { next(err); }
+}</code></pre>
+        </div>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag post">POST</span>
+            <span class="endpoint-path">/api/v1/auth/login</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Body: <code>{ "email": "...", "password": "..." }</code>. Respuesta: <code>{ "token": "eyJhbGci...", "usuario": {...} }</code>.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 Devuelve el mismo error para "email no existe" y "password incorrecta"</div>
+          <p>Si distingues los mensajes, un atacante puede enumerate qué emails están registrados. Devuelve un genérico <em>"Credenciales inválidas"</em> en ambos casos.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="refresh">
+        <h2>Refresh Tokens</h2>
+        <p>Un <strong>access token</strong> de corta duración (15 min–2 h) minimiza el impacto si se filtra. Un <strong>refresh token</strong> de larga duración (días/semanas) se usa para obtener nuevos access tokens sin pedir login de nuevo.</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Característica</th><th>Access Token</th><th>Refresh Token</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Duración</td><td>Corta (min–horas)</td><td>Larga (días)</td></tr>
+              <tr><td>Uso</td><td>En cada petición autenticada</td><td>Solo en /auth/refresh</td></tr>
+              <tr><td>Almacenamiento</td><td>Memoria JS / sessionStorage</td><td>Cookie httpOnly + secure + SameSite</td></tr>
+              <tr><td>Revocable</td><td>No (stateless)</td><td>Sí (almacenado en BD/blacklist)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Nuevo access token a partir de un refresh válido</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>export async function renovar(req, res) {
+  const refreshToken = req.cookies?.refresh_token;
+  if (!refreshToken) return res.status(401).json({ error: 'Falta refresh token' });
+
+  try {
+    const payload = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    const access = jwt.sign(
+      { sub: payload.sub, rol: payload.rol },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    res.json({ token: access });
+  } catch {
+    res.status(401).json({ error: 'Refresh token inválido, vuelve a iniciar sesión' });
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="rbac">
+        <h2>RBAC: control de acceso por roles</h2>
+        <p>El middleware <code>requerirRol</code> valida que el usuario autenticado tenga uno de los roles permitidos para esa ruta.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>middlewares/rbac.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>export function requerirRol(...rolesPermitidos) {
+  return (req, res, next) => {
+    if (!req.user) return res.status(401).json({ error: 'No autenticado' });
+    if (!rolesPermitidos.includes(req.user.rol)) {
+      return res.status(403).json({ error: 'Permisos insuficientes' });
+    }
+    next();
+  };
+}
+
+// Rutas
+router.delete('/usuarios/:id',
+  verificarToken,
+  requerirRol('admin'),
+  borrarUsuario
+);</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="seguridad">
+        <h2>Checklist de seguridad para producción</h2>
+        <ul>
+          <li>✅ Genera <code>JWT_SECRET</code> con al menos 32 bytes aleatorios (<code>crypto.randomBytes(32).toString('hex')</code>).</li>
+          <li>✅ Ajusta una expiración razonable (<code>2h</code> access tokens, <code>7d</code> refresh).</li>
+          <li>✅ Cookies con flags <code>httpOnly</code>, <code>secure</code> y <code>SameSite=Strict/Lax</code>.</li>
+          <li>✅ Configura CORS estricto (solo orígenes permitidos, no <code>*</code>).</li>
+          <li>✅ Rate limiting en <code>/auth/login</code> y <code>/auth/register</code> para frenar brute force.</li>
+          <li>✅ Usa <code>helmet()</code> para cabeceras de seguridad por defecto.</li>
+          <li>✅ Valida el esquema de entrada con Zod, Joi o express-validator.</li>
+          <li>✅ Permite invalidar sesiones revocando el refresh token en BD.</li>
+          <li>✅ Logout en el cliente <code>delete</code> el token y, en backend, black-listea el refresh.</li>
+          <li>✅ Registra los intentos de login fallidos y dispara alertas tras N fallos.</li>
+        </ul>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ OAuth/OIDC para producción seria</div>
+          <p>Para apps con muchos usuarios o requerimientos de SSO, considera delegar la autenticación a un proveedor OAuth/OIDC (Auth0, Clerk, Firebase Auth, Keycloak) en lugar de gestionar JWT tú mismo. Eso centraliza seguridad, MFA y gestión de sesiones.</p>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5 — Capítulo: Autenticación & JWT.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

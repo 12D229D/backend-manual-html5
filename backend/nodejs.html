@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Node.js & npm | Manual de Backend</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="../index.html" class="nav-link">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="nodejs.html" class="nav-link active">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="express.html" class="nav-link">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="databases.html" class="nav-link">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="auth.html" class="nav-link">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="deploy.html" class="nav-link">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Temas Node.js</div>
+        <a href="#intro" class="nav-link"><span>¿Qué es Node.js?</span></a>
+        <a href="#event-loop" class="nav-link"><span>Event Loop y Async</span></a>
+        <a href="#modulos" class="nav-link"><span>Módulos (CJS / ESM)</span></a>
+        <a href="#npm" class="nav-link"><span>npm y package.json</span></a>
+        <a href="#hola-mundo" class="nav-link"><span>Servidor Hola Mundo</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb"><a href="../index.html">Documentación</a> / <span>Guía de Node.js & npm</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <section class="hero-card">
+        <h2>🟢 Guía Práctica de Node.js & npm</h2>
+        <p>Node.js es el runtime JavaScript que permite ejecutar JS en el servidor usando el motor V8 de Chrome. Con su modelo asíncrono orientado a eventos es ideal para construir APIs, microservicios y servidores escalables.</p>
+        <div class="hero-actions">
+          <a href="#hola-mundo" class="btn-primary">Ver servidor HTTP →</a>
+          <a href="express.html" class="btn-secondary">Ir a Express →</a>
+        </div>
+      </section>
+
+      <section class="doc-section" id="intro">
+        <h2>¿Qué es Node.js?</h2>
+        <p>Node.js es un entorno de ejecución de JavaScript construido sobre el motor V8 de Google Chrome. Lo creó Ryan Dahl en 2009 para resolver el problema de la concurrencia en servidores tradicionales, introduciendo un modelo de <strong>I/O no bloqueante orientado a eventos</strong>.</p>
+
+        <h3>Características clave</h3>
+        <ul>
+          <li><strong>Single-threaded</strong> aunque puede delegar tareas a libuv (un thread pool C++) para operaciones de disco/criptografía.</li>
+          <li><strong>Asincronía nativa</strong> mediante callbacks, Promesas y <code>async/await</code>.</li>
+          <li><strong>NPM</strong>: el ecosistema de paquetes más grande del mundo, con más de 2 millones de paquetes publi­cados.</li>
+          <li><strong>Cross-platform</strong>: corre en Windows, macOS, Linux y Docker.</li>
+        </ul>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 ¿Cuándo usar Node.js?</div>
+          <p>Ideal para APIs REST, microservicios, servidores en tiempo real (WebSockets, chat), streaming, herramientas CLI yBFFs. Evítalo para tareas intensivas en CPU (procesamiento de imágenes, machine learning).</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="event-loop">
+        <h2>Event Loop y Asincronía</h2>
+        <p>El <strong>Event Loop</strong> es el núcleo del modelo de concurrencia de Node.js. Es un bucle que observa continuamente las colas de callbacks listos para ejecutarse en el hilo principal, mientras libuv procesa I/O paralelo en segundo plano.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>event-loop.js - lectura asíncrona de fichero</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>const fs = require('node:fs/promises');
+
+async function leer() {
+  console.log('1. Antes de await');
+  const datos = await fs.readFile('./paquetes.json', 'utf8');
+  console.log('2. Datos leídos:', datos.length, 'bytes');
+  console.log('3. Después de await');
+}
+
+console.log('0. Inicio');
+leer();
+console.log('4. Fin del script síncrono');
+
+// Orden de salida:
+// 0. Inicio
+// 1. Antes de await
+// 4. Fin del script síncrono
+// 2. Datos leídos: N bytes
+// 3. Después de await</code></pre>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">⚠️ No bloquees el Event Loop</div>
+          <p>Una operación síncrona larga (un bucle de millones de iteraciones, <code>JSON.parse</code> gigante o <code>crypto.pbkdf2Sync</code>) congela <em>todas</em> las peticiones del servidor. Usa las versiones asíncronas (<code>*Sync</code> sólo en arranque).</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="modulos">
+        <h2>Sistema de Módulos: CommonJS vs ESM</h2>
+        <p>Node soporta dos sistemas de módulos, configurables mediante <code>"type": "module"</code> en <code>package.json</code>.</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>CommonJS (CJS)</th>
+                <th>ES Modules (ESM)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Sintaxis</td><td><code>require()</code> / <code>module.exports</code></td><td><code>import</code> / <code>export</code></td></tr>
+              <tr><td>Carga</td><td>Síncrona</td><td>Asíncrona (estática)</td></tr>
+              <tr><td>Extensión</td><td><code>.js</code> por defecto</td><td><code>.mjs</code> o <code>.js</code> con type:module</td></tr>
+              <tr><td>Top-level await</td><td>❌ No soportado</td><td>✅ Soportado</td></tr>
+              <tr><td>Tree-shaking</td><td>Limitado</td><td>Completo (bundler)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>CommonJS</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>// matematicas.js
+function suma(a, b) { return a + b; }
+module.exports = { suma };
+
+// app.js
+const { suma } = require('./matematicas');
+console.log(suma(2, 3)); // 5</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ES Modules</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>// matematicas.mjs
+export function suma(a, b) { return a + b; }
+
+// app.mjs
+import { suma } from './matematicas.mjs';
+console.log(suma(2, 3)); // 5</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="npm">
+        <h2>npm y package.json</h2>
+        <p><strong>npm</strong> (Node Package Manager) es el gestor de paquetes oficial. <code>package.json</code> es el manifiesto de tu proyecto: declara dependencias, scripts y metadatos.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Comandos básicos de npm</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code># Inicializar un nuevo proyecto Node
+npm init -y
+
+# Instalar una dependencia de producción
+npm install express
+
+# Instalar una dependencia de desarrollo
+npm install --save-dev nodemon
+
+# Ejecutar un script definido en package.json
+npm run dev
+
+# Ejecutar un binario local instalado
+npx prisma migrate dev
+
+# Auditar vulnerabilidades conocidas
+npm audit</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>package.json típico</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>{
+  "name": "mi-backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev":   "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test":  "jest"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg":       "^8.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "jest":    "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">📌 package-lock.json</div>
+          <p>Commitea <code>package-lock.json</code> para fijar versiones exactas y garantizar instalaciones reproducibles entre desarrolladores y CI/CD. No commitees la carpeta <code>node_modules/</code>.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="hola-mundo">
+        <h2>Servidor HTTP "Hola Mundo"</h2>
+        <p>Node incluye el módulo nativo <code>http</code> para crear servidores sin ninguna dependencia externa. Sin embargo, en proyectos reales conviene usar un framework como Express (ver guía siguiente).</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>server.js - servidor HTTP nativo</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import { createServer } from 'node:http';
+
+const PORT = process.env.PORT ?? 3000;
+
+const server = createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    mensaje: 'Hola Mundo desde Node.js',
+    metodo: req.method,
+    ruta:   req.url,
+    hora:   new Date().toISOString()
+  }));
+});
+
+server.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+});</code></pre>
+        </div>
+
+        <p>Ejecútalo con:</p>
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>terminal</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>node server.js
+# → Servidor escuchando en http://localhost:3000
+
+# En otra terminal prueba con curl:
+curl http://localhost:3000/api</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">👉 Siguiente paso</div>
+          <p>A partir de este servidor mínimo, lo habitual es añadir enrutado, parseo de JSON, manejo de errores, etc. Express.js abstrae todo esto. Continúa en <a href="express.html">Guía de Express →</a>.</p>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5 — Capítulo: Node.js & npm.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>

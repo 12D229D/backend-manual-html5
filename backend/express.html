@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Express.js | Manual de Backend</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">⚙</div>
+      <h1>Manual de Backend</h1>
+    </div>
+
+    <div class="sidebar-search">
+      <input type="text" id="sidebar-search-input" placeholder="Buscar en la guía..." aria-label="Buscar temas">
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-title">Inicio</div>
+        <a href="../index.html" class="nav-link">
+          <span>📌 Visión General</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Stack Backend</div>
+        <a href="nodejs.html" class="nav-link">
+          <span>🟢 Node.js & npm</span>
+          <span class="nav-badge badge-node">JS</span>
+        </a>
+        <a href="express.html" class="nav-link active">
+          <span>🚂 Express.js</span>
+          <span class="nav-badge badge-express">API</span>
+        </a>
+        <a href="databases.html" class="nav-link">
+          <span>🗄️ Bases de Datos</span>
+          <span class="nav-badge badge-db">SQL</span>
+        </a>
+        <a href="auth.html" class="nav-link">
+          <span>🔐 Autenticación & JWT</span>
+          <span class="nav-badge badge-auth">AUTH</span>
+        </a>
+        <a href="deploy.html" class="nav-link">
+          <span>🚀 Despliegue & DevOps</span>
+          <span class="nav-badge badge-deploy">OPS</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">Temas Express</div>
+        <a href="#intro" class="nav-link"><span>¿Qué es Express?</span></a>
+        <a href="#estructura" class="nav-link"><span>Estructura del proyecto</span></a>
+        <a href="#rutas" class="nav-link"><span>Router y Rutas</span></a>
+        <a href="#middleware" class="nav-link"><span>Middlewares</span></a>
+        <a href="#errores" class="nav-link"><span>Manejo de errores</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menú">☰</button>
+        <div class="breadcrumb"><a href="../index.html">Documentación</a> / <span>Guía de Express.js</span></div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="theme-toggle" id="theme-toggle-btn">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+
+      <section class="hero-card">
+        <h2>🚂 Guía Práctica de Express.js</h2>
+        <p>Express es el framework web más usado para Node.js. Minimalista, flexible y extensible mediante middlewares, es la base ideal para construir APIs REST y aplicaciones web renderizadas en el servidor.</p>
+        <div class="hero-actions">
+          <a href="#rutas" class="btn-primary">Ver sistema de rutas →</a>
+          <a href="databases.html" class="btn-secondary">Conectar a BD →</a>
+        </div>
+      </section>
+
+      <section class="doc-section" id="intro">
+        <h2>¿Qué es Express.js?</h2>
+        <p>Express es un framework <strong>minimalista y no opinado</strong> para Node.js creado por TJ Holowaychuk en 2010. No impone arquitectura, ORM ni estructura de carpetas, sino que proporciona:</p>
+        <ul>
+          <li>Sistema de enrutado basado en verbos HTTP (<code>app.get</code>, <code>app.post</code>, …).</li>
+          <li>Encadenamiento de <strong>middlewares</strong> con la función <code>next()</code>.</li>
+          <li>Helpers de petición/respuesta (<code>req.body</code>, <code>req.params</code>, <code>req.query</code>, <code>res.json</code>).</li>
+          <li>Soporte de motores de plantillas (EJS, Pug, Handlebars).</li>
+        </ul>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Instalación e inicialización</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>npm init -y
+npm install express
+npm install --save-dev nodemon</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="estructura">
+        <h2>Estructura recomendada del proyecto</h2>
+        <p>Como Express no impone estructura, conviene adoptar una organización modular desde el inicio:</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Estructura de carpetas</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>src/
+├── config/        # variables de entorno, conexión BD
+│   └── env.js
+├── middlewares/   # auth, validaciones, errores
+│   ├── auth.js
+│   └── errorHandler.js
+├── routes/        # definición de endpoints
+│   ├── usuarios.routes.js
+│   └── auth.routes.js
+├── controllers/   # lógica de cada ruta
+│   └── usuarios.controller.js
+├── services/      # lógica de negocio reutilizable
+│   └── usuarios.service.js
+├── models/        # esquemas de BD / Prisma
+│   └── usuario.model.js
+└── server.js      # punto de entrada</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">💡 Patrón Modelo-Vista-Controlador</div>
+          <p>Separar rutas (qué URL), controladores (qué hace) y servicios (cómo se hace) facilita probar cada capa de forma aislada y mantener el código ordenado a medida que crece.</p>
+        </div>
+      </section>
+
+      <section class="doc-section" id="rutas">
+        <h2>Sistema de rutas y Express Router</h2>
+        <p>Para mantener un <code>server.js</code> limpio, conviene separar las rutas en módulos y montarlos con <code>app.use()</code>.</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>src/routes/usuarios.routes.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import { Router } from 'express';
+import { listarUsuarios, crearUsuario, obtenerUsuario } from '../controllers/usuarios.controller.js';
+
+const router = Router();
+
+router.get('/',        listarUsuarios);
+router.post('/',       crearUsuario);
+router.get('/:id',     obtenerUsuario);
+router.put('/:id',     actualizarUsuario);
+router.delete('/:id',  eliminarUsuario);
+
+export default router;</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>src/server.js - montaje de rutas</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import express from 'express';
+import usuariosRouter from './routes/usuarios.routes.js';
+import authRouter     from './routes/auth.routes.js';
+
+const app = express();
+
+app.use(express.json());                   // body parser JSON
+app.use('/api/v1/usuarios', usuariosRouter);
+app.use('/api/v1/auth',     authRouter);
+
+const PORT = process.env.PORT ?? 3000;
+app.listen(PORT, () => console.log(`API en :${PORT}`));</code></pre>
+        </div>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag get">GET</span>
+            <span class="endpoint-path">/api/v1/usuarios?pagina=1&limite=20</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Los parámetros de query se leen en <code>req.query</code> para implementar paginación, filtros y ordenamiento.</p>
+          </div>
+        </div>
+
+        <div class="endpoint-box">
+          <div class="endpoint-header">
+            <span class="method-tag post">POST</span>
+            <span class="endpoint-path">/api/v1/usuarios</span>
+          </div>
+          <div class="endpoint-body">
+            <p>El cuerpo JSON de la petición se accede vía <code>req.body</code>, ya parseado por el middleware <code>express.json()</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="middleware">
+        <h2>Middlewares en Express</h2>
+        <p>Un middleware es una función <code>(req, res, next) => {}</code>. Express los ejecuta en el orden en que se registran. Algunos tipos comunes:</p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Middleware</th>
+                <th>Rol típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>express.json()</code></td><td>Parsear body JSON entrante.</td></tr>
+              <tr><td><code>express.static()</code></td><td>Servir ficheros estáticos (CSS, JS, imágenes).</td></tr>
+              <tr><td><code>morgan</code></td><td>Logger HTTP con formato dev/combined.</td></tr>
+              <tr><td><code>cors</code></td><td>Configurar cabeceras CORS.</td></tr>
+              <tr><td><code>helmet</code></td><td>Cabeceras de seguridad HTTP por defecto.</td></tr>
+              <tr><td><code>express-rate-limit</code></td><td>Throttling / rate limiting por IP.</td></tr>
+              <tr><td>Verificador JWT</td><td>Validar token Bearer y popular <code>req.user</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>middlewares/auth.js - guard JWT</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>import jwt from 'jsonwebtoken';
+
+export function verificarToken(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token no proporcionado' });
+  }
+  const token = header.split(' ')[1];
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Token inválido o expirado' });
+  }
+}
+
+// Ruta protegida
+router.get('/perfil', verificarToken, obtenerPerfil);</code></pre>
+        </div>
+      </section>
+
+      <section class="doc-section" id="errores">
+        <h2>Manejo centralizado de errores</h2>
+        <p>Express reconoce middlewares con 4 parámetros <code>(err, req, res, next)</code> y los trata como manejadores de error. Conviene registrar el último de todos, después de todas las rutas:</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>middlewares/errorHandler.js</span>
+            <button class="copy-btn">Copiar</button>
+          </div>
+          <pre><code>export function errorHandler(err, req, res, next) {
+  console.error(err.stack);
+
+  // Error de validación (Zod, Joi, express-validator)
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: 'Datos inválidos', detalles: err.details });
+  }
+
+  // Error emitido por nosotros con statusCode
+  const status = err.statusCode ?? 500;
+  res.status(status).json({
+    error: err.message || 'Error interno del servidor',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+}
+
+// En server.js, DESPUÉS de todas las rutas:
+app.use(errorHandler);</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">✅ Buenas prácticas</div>
+          <p>Envuelve los controladores asíncronos con <code>asyncHandler</code> o <code>express-async-errors</code> para que las promesas rechazadas lleguen al middleware de errores automáticamente sin <code>try/catch</code> manuales.</p>
+        </div>
+      </section>
+
+      <footer>
+        <p>© 2026 Manual y Guía de Backend HTML5 — Capítulo: Express.js.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../js/app.js"></script>
+</body>
+</html>
